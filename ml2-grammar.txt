@@ -1,0 +1,48 @@
+/********* ML2 Simplified Grammar ************/
+
+This file contains the simplified version of ML2's grammar.
+The syntax of this file is not formal but intends to resemble BNF like rules.
+The list of symbols and their semantics is the following:
+	Pipe				Option selection rules
+	Asterisk			Repetition rule
+	Question Mark		Optional rule
+	Capital Letters		Terminal (omitted) rule
+
+/********************************************/
+
+
+Entity := Class | Individual ;
+Class := (FirstOrderClass | HighOrderClass | OrderlessClass | DataType) ({ (Feature | FeatureAssignment)* })?
+
+FirstOrderClass := class NAME MLTRelations*
+HighOrderClass := order NUMBER class NAME MLTRelations* ;
+OrderlessClass := orderless class NAME MLTRelations* ;
+Individual := individual NAME Instantiation ({ (Feature | FeatureAssignment)* })?
+DataType := datatype NAME MLTRelations* ({ (Feature | FeatureAssignment)* })? ;
+
+MLTRelations := Instantiation | Specialization | Subordination | Categorization | Powertyping
+
+Instantiation := : Class (, Class)*
+Specialization := specializes Class (, Class)*
+Subordination := subordinatedTo Class (, Class)*
+Categorization := CategorizationType Class
+Powertyping := isPowertypeOf Class
+
+CategorizationType := categorizes | completeCategorizes | disjointCategorizes | partitions
+
+Feature := Reference | Attribute | RegularityReference | RegularityAttribute
+Reference := ref NAME : Multiplicity? Class Subsets? IsOpposite?
+Multiplicity := [ CARDINALITY .. CARDINALITY ]
+Subsets := subsets Feature (, Feature)*
+IsOpposite := isOppositeTo Feature
+Attribute := att NAME : Multiplicity? Datatype Subsets?
+
+FeatureAssignment := ReferenceAssignment | AttributeAssignment
+ReferenceAssignment := ref Feature = Entity | { Entity (, Entity)* }
+AttributeAssignment := att Feature = Value | { Value (,Value)* }
+Value := STRING | NUMBER | BOOLEAN | Entity
+
+RegularityReference := regularity Reference RegularityType? Feature
+RegularityAttribute := regularity Attribute RegularityType? Feature
+RegularityType := determinesValue | determinesMinValue | determinesMaxValue | determinesAllowedValues | determinesType | determinesAllowedTypes
+
